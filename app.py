@@ -124,7 +124,7 @@ else:
             with st.spinner("Compiling generative assets via cloud clustering nodes..."):
                 
                 # PROCESSING FLOW: TEXT TO SPEECH
-                if mode == "Text to Speech (TTS Voice Pro)":
+                if mode == "Text to Speech (TTS) Module":
                     # Uses standard stable library structure maps for audio encoding translation outputs
                     tts = gTTS(text=prompt, lang='en')
                     tts.save("output.mp3")
