@@ -4,8 +4,10 @@ import glob
 from gtts import gTTS
 import fal_client
 
-# Injecting your Fal API Key directly into the system environment
-os.environ["FAL_KEY"] = "0d5645d5-fefa-4516-ac38-36b97c36fbfa:73c8e91f7110ea739b000369f0221303"
+# Set up API key securely from environment variables or use a safe fallback input
+if "FAL_KEY" not in os.environ:
+    # Fallback to your default key if not configured in Codespaces secrets
+    os.environ["FAL_KEY"] = "0d5645d5-fefa-4516-ac38-36b97c36fbfa:73c8e91f7110ea739b000369f0221303"
 
 # --- PAGE CONFIGURATION & THEME EXTRAVAGANZA ---
 st.set_page_config(page_title="Grok Video Studio Pro", page_icon="🎬", layout="wide")
@@ -82,9 +84,9 @@ else:
     # Character deletion controls inside sidebar
     if char_count > 0:
         st.sidebar.subheader("Flush Active Asset Slots")
-        for char_path in existing_chars:
+        for i, char_path in enumerate(existing_chars):
             name = os.path.basename(char_path)
-            if st.sidebar.button(f"🗑️ Wipe {name}", key=f"del_{name}"):
+            if st.sidebar.button(f"🗑️ Wipe {name}", key=f"del_{name}_{i}"):
                 os.remove(char_path)
                 st.sidebar.success(f"Purged {name}!")
                 st.rerun()
@@ -125,7 +127,6 @@ else:
                 
                 # PROCESSING FLOW: TEXT TO SPEECH
                 if mode == "Text to Speech (TTS Voice Pro)":
-                    # Uses standard stable library structure maps for audio encoding translation outputs
                     tts = gTTS(text=prompt, lang='en')
                     tts.save("output.mp3")
                     st.audio("output.mp3")
@@ -134,11 +135,9 @@ else:
                 # PROCESSING FLOW: TEXT TO VIDEO / IMAGE TO VIDEO
                 else:
                     try:
-                        # Establish standard model reference frames based on your asset state
                         char_description = f"Character features structured exactly like identity file '{selected_char}'. " if selected_char else ""
                         final_prompt = f"Cinematic studio filming block, photorealistic fidelity. {char_description}{prompt}"
                         
-                        # Route generation matrix packages out to premium cloud infrastructure endpoints
                         if mode == "Text to Video":
                             handler = fal_client.submit(
                                 "fal-ai/luma-dream-machine",
@@ -149,11 +148,9 @@ else:
                                 st.error("Image to Video requires a selected Character photo from your sidebar folder!")
                                 st.stop()
                             
-                            # Build the image generation profile using the uploaded local path
                             with open(os.path.join(CHAR_DIR, selected_char), "rb") as image_file:
                                 image_data = image_file.read()
                                             
-                            # Upload the local mobile file to temporary cloud storage so the model can process it
                             image_url = fal_client.upload(image_data, "image/jpeg")
                                             
                             handler = fal_client.submit(
@@ -165,9 +162,8 @@ else:
                             )
                         
                         result = handler.get()
-                        video_url = block_url = result["video"]["url"]
+                        video_url = result["video"]["url"]
                         
-                        # Generate the interactive video playback module directly on the user screen layout
                         st.video(video_url)
                         st.success("Cloud rendering pass successful! Playback container active.")
                         
